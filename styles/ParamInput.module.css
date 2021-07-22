@@ -1,2 +1,13 @@
-.input-container {
+.inputContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.inputContainer + .inputContainer {
+  margin-top: 5px;
+}
+
+.inputTitle {
+  width: 100px;
 }
