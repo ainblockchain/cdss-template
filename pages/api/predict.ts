@@ -1,21 +1,23 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import axios from 'axios';
 
 type Data = {
-  hpa?: number;
+  result?: any;
   error?: string;
 }
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
   try {
     const { age, height } = req.body;
-    if (age === 0) {
-      throw new Error('Divided by zero');
-    }
-    res.status(200).json({ hpa: height / age });
+    const result = await axios.post(
+      `${process.env.HE_SERVER_URL}/he/add`,
+      { operand1: age, operand2: height },
+    );
+    res.status(200).json({ result: result.data.result });
   } catch (e) {
     res.status(500).json({ error: e.message })
   }

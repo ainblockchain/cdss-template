@@ -1,3 +1,4 @@
+import AinJs from '@ainblockchain/ain-js';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { ParamInput } from '../components/paramInput';
@@ -18,6 +19,7 @@ const params: ParamInputProp = {
 };
 
 export default function Home() {
+  const ainJs = new AinJs(`${process.env.BLOCKCHAIN_NODE}`);
   const [ ageState, setAgeState ] = useState<number>(0);
   const [ heightState, setHeightState ] = useState<number>(0);
   const [ resultState, setResultState ] = useState<any>({});
@@ -27,13 +29,34 @@ export default function Home() {
   params['height'] = { ...params['height'],
     value: heightState, setter: setHeightState};
 
+  const encryptData = async (data: any) => {
+    const encrypted = ainJs.he.encrypt(Float64Array.from([data]));
+    return encrypted.save();
+  }
+
   const onClickButton = async () => {
     try {
+      await ainJs.he.init();
+      const eAge = await encryptData(ageState);
+      const eHeight = await encryptData(heightState);
+
+      /*
+      const loadedAge = ainJs.he.seal.seal.CipherText();
+      loadedAge.load(ainJs.he.seal.context, eAge);
+      const loadedHeight = ainJs.he.seal.seal.CipherText();
+      loadedHeight.load(ainJs.he.seal.context, eHeight);
+      ainJs.he.seal.evaluator.add(loadedAge, loadedHeight, loadedAge);
+      const result_local = ainJs.he.decrypt(loadedAge.save());
+      console.log(loadedAge.save());
+      console.log(result_local);
+      */
+
       const res = await axios.post('/api/predict',
-        { age: ageState, height: heightState });
-      setResultState(res.data);
+        { age: eAge, height: eHeight });
+      const result = Array.from(ainJs.he.decrypt(res.data.result))[0];
+      setResultState({result});
     } catch (e) {
-      alert(e.response.data.error);
+      console.log(e);
     }
   }
 
