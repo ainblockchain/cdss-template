@@ -14,8 +14,8 @@ type ParamInputProp = {
 }
 
 const params: ParamInputProp = {
-  'age': { title: '나이', type: 'number' },
-  'height': { title: '키', type: 'number' },
+  'age': { title: 'Age', type: 'number' },
+  'height': { title: 'Height', type: 'number' },
 };
 
 export default function Home() {
@@ -73,9 +73,9 @@ export default function Home() {
           />
         )}
       </div>
-      <button onClick={onClickButton}>입력</button>
+      <button onClick={onClickButton}>Submit</button>
       <div className={styles.resultContainer}>
-        <div className={styles.resultTitle}>결과</div>
+        <div className={styles.resultTitle}>Result</div>
         { Object.keys(resultState).map((key) => 
           <div key={key}>{`${key}: ${resultState[key]}`}</div>
         )}
