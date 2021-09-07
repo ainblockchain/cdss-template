@@ -1,8 +1,9 @@
 import AinJs from '@ainblockchain/ain-js';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ParamInput } from '../components/paramInput';
 import styles from '../styles/Home.module.css'
+import ConnectManager from '../manager/ConnectManager';
 
 type ParamInputProp = {
   [key: string]: {
@@ -23,6 +24,16 @@ export default function Home() {
   const [ ageState, setAgeState ] = useState<number>(0);
   const [ heightState, setHeightState ] = useState<number>(0);
   const [ resultState, setResultState ] = useState<any>({});
+  const [ publicKey, setPublicKey ] = useState<string>('');
+  const [ connectManager, setConnectManager ] = useState<any>(null);
+  const [ encryptedState, setEncryptedState ] = useState<string>('');
+
+  useEffect(() => {
+    const connectManager = new ConnectManager();
+    connectManager.initialize();
+    setConnectManager(connectManager);
+  }, []);
+
 
   params['age'] = { ...params['age'],
     value: ageState, setter: setAgeState};
@@ -60,6 +71,56 @@ export default function Home() {
     }
   }
 
+  const onClickBlockchainButton = async () => {
+    if (!connectManager) {
+      return;
+    }
+    connectManager.authenticate((publicKey: string) => {
+      if (publicKey) {
+        setPublicKey(publicKey);
+      } else {
+        console.error('Failed to get public key');
+      }
+    });
+  }
+
+  const onClickEncryptButton = async () => {
+    if (!connectManager) {
+      return;
+    }
+    // const data = [ageState, heightState];
+    const data = new Array(4000).fill(ageState);
+    console.log(data);
+    connectManager.encrypt(data, (result: any) => {
+      const { encrypted, success } = result;
+      if (success) {
+        console.log('success');
+        setEncryptedState(encrypted);
+      } else {
+        console.error('Failed to get public key');
+      }
+    });
+  }
+
+  const onClickDecryptButton = async () => {
+    console.log(encryptedState);
+    if (!connectManager || encryptedState === '') {
+      console.log('decrypt not ready');
+      return;
+    }
+    // const data = [ageState, heightState];
+    const data = encryptedState;
+    connectManager.decrypt(data, (result: any) => {
+      console.log(result);
+      const { decrypted, success } = result;
+      if (success) {
+        console.log('success');
+      } else {
+        console.error('Failed to decrypt');
+      }
+    });
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.paramContainer}>
@@ -73,7 +134,14 @@ export default function Home() {
           />
         )}
       </div>
-      <button onClick={onClickButton}>Submit</button>
+      <button onClick={onClickButton}>REST API</button>
+      <button onClick={onClickBlockchainButton}>Blockchain</button>
+      <button onClick={onClickEncryptButton}>Encrypt</button>
+      <button onClick={onClickDecryptButton}>Decrypt</button>
+      <div className={styles.resultContainer}>
+        <div className={styles.resultTitle}>Public Key</div>
+        <div>{publicKey}</div>
+      </div>
       <div className={styles.resultContainer}>
         <div className={styles.resultTitle}>Result</div>
         { Object.keys(resultState).map((key) => 
