@@ -1,60 +1,35 @@
 import AinJs from '@ainblockchain/ain-js';
-import axios from 'axios';
-import React, { useState } from 'react';
-import { ParamInput } from '../components/paramInput';
+import React, { useEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
+import ConnectManager from '../manager/ConnectManager';
 
-type ParamInputProp = {
-  [key: string]: {
-    title?: string;
-    type: 'number' | 'string';
-    value?: any;
-    setter?: any;
-  }
-}
-
-const params: ParamInputProp = {
-  'age': { title: 'Age', type: 'number' },
-  'height': { title: 'Height', type: 'number' },
-};
+import { BLOCKCHAIN_NODE } from './constants';
+import { EncryptSection } from '../components/encryptSection';
+import { RestApiSection } from '../components/restApiSection';
+import { DecryptSection } from '../components/decryptSection';
+import { useAgeData } from '../swr/useAgeData';
 
 export default function Home() {
-  const ainJs = new AinJs(`${process.env.BLOCKCHAIN_NODE}`);
-  const [ ageState, setAgeState ] = useState<number>(0);
-  const [ heightState, setHeightState ] = useState<number>(0);
+  const ainJs = new AinJs(BLOCKCHAIN_NODE);
   const [ resultState, setResultState ] = useState<any>({});
+  const [ publicKey, setPublicKey ] = useState<string>('');
+  const [ connectManager, setConnectManager ] = useState<any>(null);
+  const [ encryptedState, setEncryptedState ] = useState<string>('');
 
-  params['age'] = { ...params['age'],
-    value: ageState, setter: setAgeState};
-  params['height'] = { ...params['height'],
-    value: heightState, setter: setHeightState};
+  useEffect(() => {
+    const connectManager = new ConnectManager();
+    connectManager.initialize();
+    setConnectManager(connectManager);
+  }, []);
 
-  const encryptData = async (data: any) => {
-    const encrypted = ainJs.he.encrypt(Float64Array.from([data]));
-    return encrypted.save();
-  }
 
-  const onClickButton = async () => {
+  const onClickBlockchainButton = async () => {
+    if (!connectManager) {
+      return;
+    }
     try {
-      await ainJs.he.init();
-      const eAge = await encryptData(ageState);
-      const eHeight = await encryptData(heightState);
-
-      /*
-      const loadedAge = ainJs.he.seal.seal.CipherText();
-      loadedAge.load(ainJs.he.seal.context, eAge);
-      const loadedHeight = ainJs.he.seal.seal.CipherText();
-      loadedHeight.load(ainJs.he.seal.context, eHeight);
-      ainJs.he.seal.evaluator.add(loadedAge, loadedHeight, loadedAge);
-      const result_local = ainJs.he.decrypt(loadedAge.save());
-      console.log(loadedAge.save());
-      console.log(result_local);
-      */
-
-      const res = await axios.post('/api/predict',
-        { age: eAge, height: eHeight });
-      const result = Array.from(ainJs.he.decrypt(res.data.result))[0];
-      setResultState({result});
+      const publicKey = await connectManager.authenticate();
+      setPublicKey(publicKey);
     } catch (e) {
       console.log(e);
     }
@@ -62,24 +37,33 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.paramContainer}>
-        { Object.keys(params).map((key) =>
-          <ParamInput 
-            key={key}
-            title={params[key].title ? params[key].title : key}
-            type={params[key].type}
-            value={params[key].value}
-            setter={params[key].setter}
-          />
-        )}
+      <div className={styles.containerSection}>
+        <div className={styles.containerSectionTitle}>
+          나이와 키를 받아 Extension을 통해 각각 암호화한다.
+        </div>
+        <EncryptSection
+          connectManager={connectManager}
+        />
       </div>
-      <button onClick={onClickButton}>Submit</button>
+      <div className={styles.containerSection}>
+        <div className={styles.containerSectionTitle}>
+          API를 호출해 암호화된 두 값을 더한다.
+        </div>
+        <RestApiSection />
+      </div>
+      <div className={styles.containerSection}>
+        <div className={styles.containerSectionTitle}>
+          Extension을 통해 계산된 값을 복호화한다.
+        </div>
+        <DecryptSection
+          connectManager={connectManager}
+        />
+      </div>
+      {/*<button onClick={onClickBlockchainButton}>Blockchain</button>
       <div className={styles.resultContainer}>
-        <div className={styles.resultTitle}>Result</div>
-        { Object.keys(resultState).map((key) => 
-          <div key={key}>{`${key}: ${resultState[key]}`}</div>
-        )}
-      </div>
+        <div className={styles.resultTitle}>Public Key</div>
+        <div>{publicKey}</div>
+      </div>*/}
     </div>
   )
 }
