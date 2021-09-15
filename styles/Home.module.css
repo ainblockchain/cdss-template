@@ -9,16 +9,16 @@
 }
 
 .paramContainer {
-  padding: 5rem 0;
+  padding: 10px 0;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  width: 280px;
 }
 
 .resultContainer {
-  padding: 5rem 0;
+  padding: 10px 0;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -29,6 +29,25 @@
 .resultTitle {
   font-weight: bold;
   font-size: 20px;
+}
+
+.containerSection {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.containerSectionTitle {
+  font-weight: bold;
+}
+
+.sectionContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.sectionContainer > * {
+  margin: 0 10px;
 }
 
 @media (max-width: 600px) {

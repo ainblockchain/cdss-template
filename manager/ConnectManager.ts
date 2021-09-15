@@ -16,48 +16,51 @@ export default class ConnectManager {
     });
   }
 
-  public authenticate(callback?: any) {
-    if (this.CloudConnect) {
-        this.CloudConnect.getPublicKey().then((res: any) => {
-          const { publicKey, success, error } = res;
-          if (success) {
-            callback(publicKey);
-          } else {
-            console.log(error);
-            callback(null);
-          }
-        }).catch((error: any) => {
-          console.log(error);
-          callback(null);
-        });
-    } else {
-      // confirm('You have to install AIN Connect plugin.')
-    }
+  public authenticate() {
+    return new Promise(async (resolve, reject) => {
+      if (this.CloudConnect) {
+        try {
+          const res = await this.CloudConnect.getPublicKey();
+          resolve(res.publicKey);
+        } catch (e) {
+          console.log(e);
+          reject(e);
+        }
+      } else {
+        reject('You have to install AIN Connect plugin');
+      }
+    });
   }
 
-  public encrypt(data: Array<number>, callback?: any) {
-    if (this.CloudConnect) {
-      this.CloudConnect.encryptData(data).then((res: any) => {
-        callback(res);
-      }).catch((error: any) => {
-        console.log(error);
-        callback(null);
-      })
-    } else {
-      // confirm('You have to install AIN Connect plugin.')
-    }
+  public async encrypt(data: Array<number>) {
+    return new Promise(async (resolve, reject) => {
+      if (this.CloudConnect) {
+        try {
+          const res = await this.CloudConnect.encryptData(data);
+          resolve(res);
+        } catch (e) {
+          console.log(e);
+          reject(e);
+        }
+      } else {
+        reject('You have to install AIN Connect plugin');
+      }
+    });
   }
 
-  public decrypt(data: string, callback?: any) {
-    if (this.CloudConnect) {
-      this.CloudConnect.decryptData(data).then((res: any) => {
-        callback(res);
-      }).catch((error: any) => {
-        console.log(error);
-        callback(null);
-      })
-    } else {
-      // confirm('You have to install AIN Connect plugin.')
-    }
+  public decrypt(data: string) {
+    return new Promise(async (resolve, reject) => {
+      if (this.CloudConnect) {
+        try {
+          const res = await this.CloudConnect.decryptData(data);
+          resolve(res);
+        } catch (e) {
+          console.log(e);
+          reject(e);
+        }
+      } else {
+        reject('You have to install AIN Connect plugin');
+      }
+    });
   }
 }
