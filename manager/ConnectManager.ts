@@ -2,6 +2,13 @@ declare global {
   interface Window {
     CloudConnect: any;
   }
+
+  interface SendTransactionPayload {
+    ref: string,
+    value: any,
+    nonce: number,
+    parentTxHash: string | null,
+  }
 }
 
 export default class ConnectManager {
@@ -30,6 +37,38 @@ export default class ConnectManager {
         reject('You have to install AIN Connect plugin');
       }
     });
+  }
+
+  public async getPublicKey() {
+    return new Promise(async (resolve, reject) => {
+      if (this.CloudConnect) {
+        try {
+          const res = await this.CloudConnect.getPublicKey();
+          resolve(res.publicKey);
+        } catch (e) {
+          console.log(e);
+          reject(e);
+        }
+      } else {
+        reject('You have to install AIN Connect plugin');
+      }
+    })
+  }
+
+  public async sendTransaction(payload: SendTransactionPayload) {
+    return new Promise(async (resolve, reject) => {
+      if (this.CloudConnect) {
+        try {
+          const res = await this.CloudConnect.sendTransaction(payload);
+          resolve(res);
+        } catch (e) {
+          console.log(e);
+          reject(e);
+        }
+      } else {
+        reject('You have to install AIN Connect plugin');
+      }
+    })
   }
 
   public async encrypt(data: Array<number>) {

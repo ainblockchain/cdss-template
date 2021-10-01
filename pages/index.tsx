@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 import ConnectManager from '../manager/ConnectManager';
 
-import { BLOCKCHAIN_NODE } from './constants';
+import { BLOCKCHAIN_NODE } from '../common/constants';
 import { EncryptSection } from '../components/encryptSection';
 import { RestApiSection } from '../components/restApiSection';
 import { DecryptSection } from '../components/decryptSection';
@@ -49,7 +49,7 @@ export default function Home() {
         <div className={styles.containerSectionTitle}>
           API를 호출해 암호화된 두 값을 더한다.
         </div>
-        <RestApiSection />
+        <RestApiSection connectManager={connectManager} />
       </div>
       <div className={styles.containerSection}>
         <div className={styles.containerSectionTitle}>
