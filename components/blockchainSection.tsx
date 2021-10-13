@@ -93,9 +93,9 @@ export const BlockchainSection = ({
         </div>
       </div>
       <div className={styles.buttonContainer}>
-        <button disabled={encAgeData === '' || encHeightData === ''}
+        <button disabled={encAgeData === ''}
           onClick={onClickUploadAgeButton}>Upload Age</button>
-        <button disabled={encAgeData === '' || encHeightData === ''}
+        <button disabled={encHeightData === ''}
           onClick={onClickUploadHeightButton}>Upload Height</button>
       </div>
       <div className={styles.paramContainer}>
