@@ -7,7 +7,6 @@ declare global {
     ref: string,
     value: any,
     nonce: number,
-    parentTxHash: string | null,
   }
 }
 
@@ -62,7 +61,6 @@ export default class ConnectManager {
           const res = await this.CloudConnect.sendTransaction(payload);
           resolve(res);
         } catch (e) {
-          console.log(e);
           reject(e);
         }
       } else {
