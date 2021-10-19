@@ -24,7 +24,7 @@ export const BlockchainSection = ({
   const [ heightKeyState, setHeightKeyState ] = useState<string>('');
   const [ publicKey, setPublicKey ] = useState<string>('');
   const [ taskIdState, setTaskIdState ] = useState<string>('');
-  let unsubscribe;
+  let intervalId: NodeJS.Timeout;
 
   useEffect(() => {
     async function fetchPublicKey() {
@@ -52,12 +52,15 @@ export const BlockchainSection = ({
       const res = await connectManager.sendTransaction(payload);
       if (res.result.code === 0 /* success */) {
         setTaskIdState(taskId);
-        unsubscribe = setInterval(async () => {
-          const responseRef = `${PATH_PREFIX}/tasks/response/${publicKey}/${taskIdState}`;
+        intervalId = setInterval(async () => {
+          const responseRef = `${PATH_PREFIX}/tasks/response/${publicKey}/${taskId}`;
           const result = await axios.get(
             `${BLOCKCHAIN_NODE}/get_value?ref=${responseRef}`
           );
-          console.log(result);
+          if (result.data.result) {
+            clearInterval(intervalId);
+            mutateResultData(result.data.result.result);
+          }
         }, 1000)
       } else{
         console.log(res.result.error_message);
@@ -153,6 +156,10 @@ export const BlockchainSection = ({
         {resultData &&
           <div>
             Result:
+            <a target='_blank' rel='noreferrer'
+                href={`${BLOCKCHAIN_NODE}/get_value?ref=${PATH_PREFIX}/tasks/response/${publicKey}/${taskIdState}`}>
+              {`${resultData.substring(0, 15)}`}
+            </a>
           </div>}
       </div>
     </div>
