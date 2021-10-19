@@ -87,7 +87,6 @@ export const BlockchainSection = ({
 
   const onClickUploadHeightButton = async () => {
     try {
-      const publicKey = await connectManager.getPublicKey();
       const heightKeyId = nanoid();
       const heightPayload: SendTransactionPayload = {
         ref: `/apps/he_health_care/data/${publicKey}/${heightKeyId}`,
