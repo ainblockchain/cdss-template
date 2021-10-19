@@ -22,22 +22,6 @@ export default class ConnectManager {
     });
   }
 
-  public authenticate() {
-    return new Promise(async (resolve, reject) => {
-      if (this.CloudConnect) {
-        try {
-          const res = await this.CloudConnect.getPublicKey();
-          resolve(res.publicKey);
-        } catch (e) {
-          console.log(e);
-          reject(e);
-        }
-      } else {
-        reject('You have to install AIN Connect plugin');
-      }
-    });
-  }
-
   public async getPublicKey() {
     return new Promise(async (resolve, reject) => {
       if (this.CloudConnect) {
@@ -76,7 +60,6 @@ export default class ConnectManager {
           const res = await this.CloudConnect.encryptData(data);
           resolve(res);
         } catch (e) {
-          console.log(e);
           reject(e);
         }
       } else {

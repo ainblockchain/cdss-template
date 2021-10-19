@@ -23,18 +23,6 @@ export default function Home() {
     setConnectManager(connectManager);
   }, []);
 
-  const onClickBlockchainButton = async () => {
-    if (!connectManager) {
-      return;
-    }
-    try {
-      const publicKey = await connectManager.authenticate();
-      setPublicKey(publicKey);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.containerSection}>

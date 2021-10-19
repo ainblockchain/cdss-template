@@ -27,7 +27,6 @@ export const BlockchainSection = ({
   let intervalId: NodeJS.Timeout;
 
   useEffect(() => {
-    console.log(BLOCKCHAIN_NODE);
     async function fetchPublicKey() {
       if (connectManager) {
         const publicKey = await connectManager.getPublicKey();
