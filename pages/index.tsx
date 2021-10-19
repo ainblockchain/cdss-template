@@ -23,7 +23,6 @@ export default function Home() {
     setConnectManager(connectManager);
   }, []);
 
-
   const onClickBlockchainButton = async () => {
     if (!connectManager) {
       return;

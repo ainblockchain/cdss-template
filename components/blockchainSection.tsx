@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AinJs from '@ainblockchain/ain-js';
 import axios from 'axios';
 import { customAlphabet } from 'nanoid'
@@ -10,6 +10,7 @@ import styles from '../styles/Home.module.css'
 import { BLOCKCHAIN_NODE } from '../common/constants';
 
 const PATH_PREFIX = '/apps/he_health_care';
+const WORKER_ID = '0xBB6b88265875c73d98dE81c2A9F3B58Ef2557b4f';
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 20);
 
 export const BlockchainSection = ({
@@ -21,13 +22,25 @@ export const BlockchainSection = ({
   const { data: resultData, mutate: mutateResultData } = useResultData();
   const [ ageKeyState, setAgeKeyState ] = useState<string>('');
   const [ heightKeyState, setHeightKeyState ] = useState<string>('');
+  const [ publicKey, setPublicKey ] = useState<string>('');
+  const [ taskIdState, setTaskIdState ] = useState<string>('');
+  let unsubscribe;
+
+  useEffect(() => {
+    async function fetchPublicKey() {
+      if (connectManager) {
+        const publicKey = await connectManager.getPublicKey();
+        setPublicKey(publicKey);
+      }
+    }
+    fetchPublicKey();
+  })
 
   const onClickBlockchainButton = async () => {
     try {
-      const publicKey = await connectManager.getPublicKey();
       const taskId = nanoid();
       const payload: SendTransactionPayload = {
-        ref: `${PATH_PREFIX}/tasks/request/0xTESTWORKER/${taskId}`,
+        ref: `${PATH_PREFIX}/tasks/request/${WORKER_ID}/${taskId}`,
         value: {
           type: 'add',
           user_address: publicKey,
@@ -37,8 +50,18 @@ export const BlockchainSection = ({
         nonce: -1,
       }
       const res = await connectManager.sendTransaction(payload);
-      console.log(res);
-      // mutateResultData(res.data.result);
+      if (res.result.code === 0 /* success */) {
+        setTaskIdState(taskId);
+        unsubscribe = setInterval(async () => {
+          const responseRef = `${PATH_PREFIX}/tasks/response/${publicKey}/${taskIdState}`;
+          const result = await axios.get(
+            `${BLOCKCHAIN_NODE}/get_value?ref=${responseRef}`
+          );
+          console.log(result);
+        }, 1000)
+      } else{
+        console.log(res.result.error_message);
+      }
     } catch (e) {
       console.log(e);
     }
@@ -46,7 +69,6 @@ export const BlockchainSection = ({
 
   const onClickUploadAgeButton = async () => {
     try {
-      const publicKey = await connectManager.getPublicKey();
       const ageKeyId = nanoid();
       const agePayload: SendTransactionPayload = {
         ref: `/apps/he_health_care/data/${publicKey}/${ageKeyId}`,
@@ -99,22 +121,39 @@ export const BlockchainSection = ({
           onClick={onClickUploadHeightButton}>Upload Height</button>
       </div>
       <div className={styles.paramContainer}>
-        <div>
-          { ageKeyState ? `Encrypted Age ID: ${ageKeyState}` : ''}
-        </div>
-        <div>
-          { heightKeyState ? `Encrypted Height ID: ${heightKeyState}` : ''}
-        </div>
+        {ageKeyState &&
+          <div>
+            Encrypted Age ID:
+            <a target='_blank' rel='noreferrer'
+                href={`${BLOCKCHAIN_NODE}/get_value?ref=${PATH_PREFIX}/data/${publicKey}/${ageKeyState}`}>
+              {ageKeyState}
+            </a>
+          </div>}
+        {heightKeyState !== '' && 
+          <div>
+            Encrypted Height ID:
+            <a target='_blank' rel='noreferrer'
+                href={`${BLOCKCHAIN_NODE}/get_value?ref=${PATH_PREFIX}/data/${publicKey}/${heightKeyState}`}>
+              {heightKeyState}
+            </a>
+          </div>
+        }
       </div>
       <button disabled={ageKeyState === '' || heightKeyState === ''}
         onClick={onClickBlockchainButton}>Blockchain</button>
       <div className={styles.paramContainer}>
-        <div>
-          { resultData ? 
-            `Result: ${resultData.substring(0, 15)}...`
-            : ''
-          }
-        </div>
+        {taskIdState !== '' &&
+          <div>
+            Task ID:
+            <a target='_blank' rel='noreferrer'
+                href={`${BLOCKCHAIN_NODE}/get_value?ref=${PATH_PREFIX}/tasks/request/${WORKER_ID}/${taskIdState}`}>
+              {taskIdState}
+            </a>
+          </div>}
+        {resultData &&
+          <div>
+            Result:
+          </div>}
       </div>
     </div>
   );
