@@ -4,5 +4,6 @@ RUN mkdir /cdss
 WORKDIR /cdss
 ADD . /cdss
 RUN yarn install
+RUN yarn build
 
 CMD [ "yarn", "start" ]
