@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react';
 import styles from '../styles/Home.module.css'
 import ConnectManager from '../manager/ConnectManager';
 
-import { BLOCKCHAIN_NODE } from './constants';
+import { BLOCKCHAIN_NODE } from '../common/constants';
 import { EncryptSection } from '../components/encryptSection';
-import { RestApiSection } from '../components/restApiSection';
+// import { RestApiSection } from '../components/restApiSection';
+import { BlockchainSection } from '../components/blockchainSection';
 import { DecryptSection } from '../components/decryptSection';
 import { useAgeData } from '../swr/useAgeData';
 
@@ -22,19 +23,6 @@ export default function Home() {
     setConnectManager(connectManager);
   }, []);
 
-
-  const onClickBlockchainButton = async () => {
-    if (!connectManager) {
-      return;
-    }
-    try {
-      const publicKey = await connectManager.authenticate();
-      setPublicKey(publicKey);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.containerSection}>
@@ -45,11 +33,17 @@ export default function Home() {
           connectManager={connectManager}
         />
       </div>
-      <div className={styles.containerSection}>
+      {/*<div className={styles.containerSection}>
         <div className={styles.containerSectionTitle}>
           API를 호출해 암호화된 두 값을 더한다.
         </div>
-        <RestApiSection />
+        <RestApiSection connectManager={connectManager} />
+      </div>*/}
+      <div className={styles.containerSection}>
+        <div className={styles.containerSectionTitle}>
+          Blockchain에 암호화된 값과 동형암호 연산 요청을 제출한다. 
+        </div>
+        <BlockchainSection connectManager={connectManager} />
       </div>
       <div className={styles.containerSection}>
         <div className={styles.containerSectionTitle}>

@@ -1,12 +1,13 @@
 import React from 'react';
 import AinJs from '@ainblockchain/ain-js';
 import axios from 'axios';
+import { customAlphabet } from 'nanoid'
 
 import { useEncAgeData } from '../swr/useEncAgeData';
 import { useEncHeightData } from '../swr/useEncHeightData';
 import { useResultData } from '../swr/useResultData';
 import styles from '../styles/Home.module.css'
-import { BLOCKCHAIN_NODE } from '../pages/constants';
+import { BLOCKCHAIN_NODE } from '../common/constants';
 
 export const RestApiSection = ({
 }: any): React.ReactElement => {

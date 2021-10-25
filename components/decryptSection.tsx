@@ -29,24 +29,23 @@ export const DecryptSection = ({
   return (
     <div className={styles.sectionContainer}>
       <div className={styles.paramContainer}>
-        <div>
-          { resultData ? 
-            `Result: ${resultData.substring(0, 15)}...`
-            : ''
-          }
-        </div>
+        {resultData &&
+          <div>
+            Result:
+            {`${resultData.substring(0, 15)}`}
+          </div>}
       </div>
       <button disabled={resultData === ''}
         onClick={onClickDecryptButton}>Decrypt</button>
       <div className={styles.paramContainer}>
         <div>
-          { resultData ? 
+          { resultDecrypt ? 
             `Decrypt result: ${resultDecrypt}`
             : ''
           }
         </div>
         <div>
-          { resultData ? 
+          { resultDecrypt ? 
             `Diff: ${Number(ageData) + Number(heightData) - resultDecrypt}`
             : ''
           }

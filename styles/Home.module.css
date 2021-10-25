@@ -10,7 +10,6 @@
 
 .paramContainer {
   padding: 10px 0;
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -35,6 +34,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  width: 100%;
 }
 .containerSectionTitle {
   font-weight: bold;
@@ -45,9 +45,16 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 .sectionContainer > * {
   margin: 0 10px;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @media (max-width: 600px) {

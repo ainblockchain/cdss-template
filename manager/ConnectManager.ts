@@ -2,6 +2,12 @@ declare global {
   interface Window {
     CloudConnect: any;
   }
+
+  interface SendTransactionPayload {
+    ref: string,
+    value: any,
+    nonce: number,
+  }
 }
 
 export default class ConnectManager {
@@ -16,7 +22,7 @@ export default class ConnectManager {
     });
   }
 
-  public authenticate() {
+  public async getPublicKey() {
     return new Promise(async (resolve, reject) => {
       if (this.CloudConnect) {
         try {
@@ -29,7 +35,22 @@ export default class ConnectManager {
       } else {
         reject('You have to install AIN Connect plugin');
       }
-    });
+    })
+  }
+
+  public async sendTransaction(payload: SendTransactionPayload) {
+    return new Promise(async (resolve, reject) => {
+      if (this.CloudConnect) {
+        try {
+          const res = await this.CloudConnect.sendTransaction(payload);
+          resolve(res);
+        } catch (e) {
+          reject(e);
+        }
+      } else {
+        reject('You have to install AIN Connect plugin');
+      }
+    })
   }
 
   public async encrypt(data: Array<number>) {
@@ -39,7 +60,6 @@ export default class ConnectManager {
           const res = await this.CloudConnect.encryptData(data);
           resolve(res);
         } catch (e) {
-          console.log(e);
           reject(e);
         }
       } else {
