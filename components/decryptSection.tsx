@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
 
 import { useAgeData } from '../swr/useAgeData';
-import { useHeightData } from '../swr/useHeightData';
-import { useResultData } from '../swr/useResultData';
+import { useEncAgeData } from '../swr/useEncAgeData';
 import styles from '../styles/Home.module.css'
 
 export const DecryptSection = ({
   connectManager,
 }: any): React.ReactElement => {
-  const { data: resultData } = useResultData();
   const { data: ageData } = useAgeData();
-  const { data: heightData } = useHeightData();
   const [ resultDecrypt, setResultDecrypt ] = useState<number>(0);
+  const { data: encAgeData } = useEncAgeData();
 
   const onClickDecryptButton = async () => {
     if (!connectManager) {
       return;
     }
     try {
-      const res = await connectManager.decrypt(resultData);
+      const res = await connectManager.decrypt(encAgeData);
       setResultDecrypt(res.decrypted[0]);
     } catch (e) {
       console.log(e);
@@ -29,13 +27,13 @@ export const DecryptSection = ({
   return (
     <div className={styles.sectionContainer}>
       <div className={styles.paramContainer}>
-        {resultData &&
+        {encAgeData &&
           <div>
             Result:
-            {`${resultData.substring(0, 15)}`}
+            {`${encAgeData.substring(0, 15)}`}
           </div>}
       </div>
-      <button disabled={resultData === ''}
+      <button disabled={encAgeData === ''}
         onClick={onClickDecryptButton}>Decrypt</button>
       <div className={styles.paramContainer}>
         <div>
@@ -46,7 +44,7 @@ export const DecryptSection = ({
         </div>
         <div>
           { resultDecrypt ? 
-            `Diff: ${Number(ageData) + Number(heightData) - resultDecrypt}`
+            `Diff: ${Number(ageData) - resultDecrypt}`
             : ''
           }
         </div>

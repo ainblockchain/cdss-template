@@ -3,8 +3,6 @@ import React from 'react';
 import { ParamInput } from './paramInput';
 import { useAgeData } from '../swr/useAgeData';
 import { useEncAgeData } from '../swr/useEncAgeData';
-import { useHeightData } from '../swr/useHeightData';
-import { useEncHeightData } from '../swr/useEncHeightData';
 import styles from '../styles/Home.module.css'
 
 type ParamInputProp = {
@@ -18,7 +16,6 @@ type ParamInputProp = {
 
 const params: ParamInputProp = {
   'age': { title: 'Age', type: 'number' },
-  'height': { title: 'Height', type: 'number' },
 };
 
 export const EncryptSection = ({
@@ -26,25 +23,19 @@ export const EncryptSection = ({
 }: any): React.ReactElement => {
   const { data: ageData, mutate: mutateAgeData } = useAgeData();
   const { data: encAgeData, mutate: mutateEncAgeData } = useEncAgeData();
-  const { data: heightData, mutate: mutateHeightData } = useHeightData();
-  const { data: encHeightData, mutate: mutateEncHeightData } = useEncHeightData();
 
   params['age'] = { ...params['age'],
     value: ageData, setter: mutateAgeData};
-  params['height'] = { ...params['height'],
-    value: heightData, setter: mutateHeightData};
 
   const onClickEncryptButton = async () => {
     if (!connectManager) {
       return;
     }
     const ageArray = [ageData];
-    const dataHeight = [heightData];
     try {
       const resAge = await connectManager.encrypt(ageArray);
+      console.log(resAge.encrypted.length);
       mutateEncAgeData(resAge.encrypted);
-      const resHeight = await connectManager.encrypt(dataHeight);
-      mutateEncHeightData(resHeight.encrypted)
     } catch (e) {
       console.log(e);
       console.error('Failed to encrypt data');
@@ -69,12 +60,6 @@ export const EncryptSection = ({
         <div>
           { encAgeData ? 
             `Encrypted Age: ${encAgeData.substring(0, 15)}...`
-            : ''
-          }
-        </div>
-        <div>
-          { encHeightData ? 
-            `Encrypted Height: ${encHeightData.substring(0, 15)}...`
             : ''
           }
         </div>
