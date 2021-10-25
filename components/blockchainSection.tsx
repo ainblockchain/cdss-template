@@ -22,6 +22,8 @@ export const BlockchainSection = ({
   const { data: resultData, mutate: mutateResultData } = useResultData();
   const [ ageKeyState, setAgeKeyState ] = useState<string>('');
   const [ heightKeyState, setHeightKeyState ] = useState<string>('');
+  const [ ageHash, setAgeHash ] = useState<string>('');
+  const [ heightHash, setHeightHash ] = useState<string>('');
   const [ publicKey, setPublicKey ] = useState<string>('');
   const [ taskIdState, setTaskIdState ] = useState<string>('');
   let intervalId: NodeJS.Timeout;
@@ -78,7 +80,8 @@ export const BlockchainSection = ({
         value: encAgeData,
         nonce: -1,
       }
-      await connectManager.sendTransaction(agePayload);
+      const res = await connectManager.sendTransaction(agePayload);
+      setAgeHash(res.tx_hash);
       setAgeKeyState(ageKeyId);
     } catch (e) {
       console.log(e);
@@ -93,7 +96,8 @@ export const BlockchainSection = ({
         value: encHeightData,
         nonce: -1,
       }
-      await connectManager.sendTransaction(heightPayload);
+      const res = await connectManager.sendTransaction(heightPayload);
+      setHeightHash(res.tx_hash);
       setHeightKeyState(heightKeyId);
     } catch (e) {
       console.log(e);
@@ -123,12 +127,19 @@ export const BlockchainSection = ({
           onClick={onClickUploadHeightButton}>Upload Height</button>
       </div>
       <div className={styles.paramContainer}>
-        {ageKeyState &&
+        {ageKeyState !== '' &&
           <div>
             Encrypted Age ID:
             <a target='_blank' rel='noreferrer'
                 href={`${BLOCKCHAIN_NODE}/get_value?ref=${PATH_PREFIX}/data/${publicKey}/${ageKeyState}`}>
               {ageKeyState}
+            </a>
+          </div>}
+        {ageHash !== '' &&
+          <div>
+            <a target='_blank' rel='noreferrer'
+                href={`${BLOCKCHAIN_NODE}/get_transaction?hash=${ageHash}`}>
+              Age Tx Hash
             </a>
           </div>}
         {heightKeyState !== '' && 
@@ -137,6 +148,14 @@ export const BlockchainSection = ({
             <a target='_blank' rel='noreferrer'
                 href={`${BLOCKCHAIN_NODE}/get_value?ref=${PATH_PREFIX}/data/${publicKey}/${heightKeyState}`}>
               {heightKeyState}
+            </a>
+          </div>
+        }
+        {heightHash !== '' && 
+          <div>
+            <a target='_blank' rel='noreferrer'
+                href={`${BLOCKCHAIN_NODE}/get_transaction?hash=${heightHash}`}>
+              Height Tx Hash
             </a>
           </div>
         }
