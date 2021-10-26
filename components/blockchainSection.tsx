@@ -26,6 +26,7 @@ export const BlockchainSection = ({
   const [ heightHash, setHeightHash ] = useState<string>('');
   const [ publicKey, setPublicKey ] = useState<string>('');
   const [ taskIdState, setTaskIdState ] = useState<string>('');
+  const [ taskIdHash, setTaskIdHash ] = useState<string>('');
   let intervalId: NodeJS.Timeout;
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export const BlockchainSection = ({
       const res = await connectManager.sendTransaction(payload);
       if (res.result.code === 0 /* success */) {
         setTaskIdState(taskId);
+        setTaskIdHash(res.tx_hash);
         intervalId = setInterval(async () => {
           const responseRef = `${PATH_PREFIX}/tasks/response/${publicKey}/${taskId}`;
           const result = await axios.get(
@@ -169,6 +171,14 @@ export const BlockchainSection = ({
             <a target='_blank' rel='noreferrer'
                 href={`${BLOCKCHAIN_NODE}/get_value?ref=${PATH_PREFIX}/tasks/request/${WORKER_ID}/${taskIdState}`}>
               {taskIdState}
+            </a>
+          </div>}
+        {taskIdState !== '' &&
+          <div>
+            Task ID Tx Hash:
+            <a target='_blank' rel='noreferrer'
+                href={`${BLOCKCHAIN_NODE}/get_transaction?hash=${taskIdHash}`}>
+              link
             </a>
           </div>}
         {resultData &&
